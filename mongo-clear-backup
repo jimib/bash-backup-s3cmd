@@ -6,7 +6,7 @@ S3_BUCKET_NAME="jimib-backups"
 S3_BUCKET_PATH="mongodb"
 
 
-#Delete backups older than 1 week
+#Delete backups older than 3 days
 lineNum=0
 s3cmd ls s3://$S3_BUCKET_NAME/$S3_BUCKET_PATH/ | while read -r line;  
   do  
