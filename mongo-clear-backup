@@ -1,0 +1,31 @@
+#!/bin/sh
+DIR_HOME="/home/git"
+DIR_REPO=$DIR_HOME"/repositories"
+TIMESTAMP=`date +%F-%H%M`
+S3_BUCKET_NAME="jimib-backups"
+S3_BUCKET_PATH="mongodb"
+
+
+#Delete backups older than 1 week
+lineNum=0
+s3cmd ls s3://$S3_BUCKET_NAME/$S3_BUCKET_PATH/ | while read -r line;  
+  do  
+    lineNum=`expr $lineNum + 1`	 
+    if [ $lineNum -gt 1 ]
+    then
+    	createDate=`echo $line | awk {'print $1" "$2'}`  
+    	createDate=`date -d"$createDate" +%s`  
+    	olderThan=`date -d"-3 days" +%s` 
+	 
+    	if [ $createDate -lt $olderThan ]  
+    	then   
+    	  	fileName=`echo $line|awk {'print $4'}`  
+   	   	echo $fileName  
+        	if [ $fileName != "" ]  
+          	then  
+            		# echo "Deleting "$fileName
+	    		s3cmd del "$fileName"  
+        	fi  
+    	fi
+    fi  
+  done; 

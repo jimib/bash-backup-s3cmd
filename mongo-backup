@@ -1,0 +1,21 @@
+MONGODUMP_PATH="/usr/bin/mongodump --username admin --password zqdnGPqX"
+TIMESTAMP=`date +%F-%H%M`
+S3_BUCKET_NAME="jimib-backups"
+S3_BUCKET_PATH="mongodb"
+
+# Create backup
+$MONGODUMP_PATH
+
+# Add timestamp to backup
+mv dump mongodb-$TIMESTAMP
+tar cf mongodb-$TIMESTAMP.tar mongodb-$TIMESTAMP
+
+# Upload to S3
+s3cmd put mongodb-$TIMESTAMP.tar s3://$S3_BUCKET_NAME/$S3_BUCKET_PATH/mongodb-$TIMESTAMP.tar
+
+# Delete everything when we're finished
+rm -R -f mongodb-$TIMESTAMP
+rm mongodb-$TIMESTAMP.tar
+
+#clear old logs off S3
+/home/git/scripts/mongo-clear-backup

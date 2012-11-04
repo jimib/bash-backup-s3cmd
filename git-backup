@@ -1,0 +1,22 @@
+DIR_HOME="/home/git"
+DIR_REPO=$DIR_HOME"/repositories"
+TIMESTAMP=`date +%F-%H%M`
+S3_BUCKET_NAME="jimib-backups"
+S3_BUCKET_PATH="git"
+
+echo $DIR_REPO
+
+# Create backup
+cd $DIR_HOME
+
+# Add timestamp to backup
+tar -c --recursion -p --file=$DIR_HOME/git-$TIMESTAMP.tar $DIR_REPO
+
+# Upload to S3
+s3cmd put $DIR_HOME/git-$TIMESTAMP.tar s3://$S3_BUCKET_NAME/$S3_BUCKET_PATH/git-$TIMESTAMP.tar
+
+# Delete everything when we're finished
+rm git-$TIMESTAMP.tar
+
+# clear the backups - to remove older files
+/home/git/scripts/git-clear-backup
